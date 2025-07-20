@@ -1272,20 +1272,15 @@ export default function FilesScreen() {
           }
         >
             {/* Glassy Search Bar */}
-            <BlurView intensity={60} tint="dark" style={[styles.glassSearchBar, { backgroundColor: 'rgba(20,40,80,0.18)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', overflow: 'hidden' }]}> 
-              <Feather name="search" size={22} color="#b0c4de" style={styles.searchIcon} />
+            <BlurView intensity={60} tint="dark" style={[styles.glassySearchBarWrap, { overflow: 'hidden' }]}> 
+              <Feather name="search" size={20} color={theme.textSecondary} style={styles.searchIcon} />
             <TextInput
-                style={[styles.glassSearchInput, { fontFamily: 'Inter_400Regular' }]}
+                style={[styles.glassSearchInput, { color: theme.searchText, fontFamily: 'Inter_400Regular' }]}
               placeholder="Search files..."
-                placeholderTextColor="#b0c4de"
+                placeholderTextColor={theme.searchPlaceholder}
               value={searchQuery}
               onChangeText={handleSearch}
-                returnKeyType="search"
-                clearButtonMode="while-editing"
             />
-              <TouchableOpacity onPress={refreshFiles} style={styles.searchRefreshBtn}>
-                <Feather name="refresh-cw" size={20} color="#2979FF" />
-            </TouchableOpacity>
             </BlurView>
             {/* Search Results */}
             {searchQuery && searchResults !== null && (
@@ -1321,17 +1316,25 @@ export default function FilesScreen() {
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat.key}
-                  style={[
-                    styles.segmentTab,
-                    selectedCategory === cat.key && [styles.segmentTabSelected, { borderBottomColor: theme.primary }],
-                  ]}
+                  style={{
+                    borderRadius: 999,
+                    borderWidth: selectedCategory === cat.key ? 0 : 0.5,
+                    borderColor: selectedCategory === cat.key ? 'transparent' : '#2979FF',
+                    backgroundColor: selectedCategory === cat.key ? '#fff' : 'transparent',
+                    paddingVertical: 8,
+                    paddingHorizontal: 22,
+                    marginRight: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 60,
+                  }}
                   onPress={() => setSelectedCategory(cat.key)}
                 >
                   <Text
                     style={{
                       fontFamily: 'Inter_700Bold',
                       fontSize: 16,
-                      color: '#fff',
+                      color: selectedCategory === cat.key ? '#0a0f1c' : '#2979FF',
                       letterSpacing: 0.1,
                     }}
                   >
@@ -2458,9 +2461,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 18,
     paddingVertical: 12,
-    backgroundColor: 'rgba(20,40,80,0.32)',
-    borderWidth: 1.2,
-    borderColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: 'transparent', // fully transparent
+    borderWidth: 0, // remove border
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
@@ -2468,7 +2470,7 @@ const styles = StyleSheet.create({
   },
   glassSearchInput: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent', // fully transparent
     borderRadius: 16,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -2476,6 +2478,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#fff',
     fontFamily: 'Inter',
+    borderWidth: 0, // remove border
+    shadowOpacity: 0, // remove shadow
   },
   searchIcon: {
     marginRight: 10,
@@ -2804,5 +2808,23 @@ const styles = StyleSheet.create({
   },
   segmentTabSelected: {
     borderBottomWidth: 2,
+  },
+  glassySearchBarWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 20, // reduced from 32
+    marginHorizontal: 0,
+    marginBottom: 16,
+    paddingHorizontal: 14, // slightly reduced
+    paddingVertical: 8, // reduced from 14
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+    backgroundColor: 'rgba(20,40,80,0.32)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.10)',
+    width: '95%',
+    alignSelf: 'center',
   },
 }); 
