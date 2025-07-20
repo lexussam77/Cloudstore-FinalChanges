@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   touchable: {
     alignItems: 'center',
-    padding: 16,
+    padding: 0,
     width: '100%',
     borderRadius: 18,
   },
