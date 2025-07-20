@@ -396,7 +396,7 @@ export default function CompressionScreen() {
           <Image source={HappyStudentBro} style={{ width: '100%', height: 160, borderRadius: 22 }} resizeMode="cover" />
       </View>
         {/* Stats Section */}
-        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, padding: 24, alignItems: 'center', width: '100%', marginBottom: 18, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12 }}>
+        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, paddingVertical: 12, paddingHorizontal: 12, width: '100%', marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12, overflow: 'hidden', justifyContent: 'center' }}>
           <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 17, color: WHITE, marginBottom: 14, textAlign: 'center' }}>Your Cloud Analytics</Text>
           <View style={{ flexDirection: 'row', gap: 12, width: '100%', marginBottom: 12 }}>
             <BlurView intensity={80} tint="dark" style={{ flex: 1, borderRadius: 18, padding: 16, alignItems: 'center', marginHorizontal: 2, shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
@@ -426,12 +426,12 @@ export default function CompressionScreen() {
       {/* Section Divider */}
         <View style={{ height: 1, backgroundColor: GLASS_BORDER, marginHorizontal: 24, marginBottom: 18, opacity: 0.18, borderRadius: 1 }} />
       {/* Compressed Files Section */}
-        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, padding: 24, width: '100%', marginBottom: 18, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12 }}> 
-          <Text style={[styles.sectionTitle, { color: WHITE }]}>Compressed Files</Text>
+        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, paddingVertical: 24, paddingHorizontal: 0, width: '100%', marginHorizontal: 0, marginBottom: 18, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12, overflow: 'hidden' }}> 
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 10, textAlign: 'left', marginLeft: 18 }}>Compressed Files</Text>
         {compressedFiles.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="archive" size={48} color={theme.textSecondary} />
-            <Text style={[styles.emptyText, { color: theme.textSecondary }]}>No compressed files available</Text>
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: theme.textSecondary, textAlign: 'left', marginLeft: 18 }}>No compressed files available</Text>
           </View>
         ) : (
           compressedFiles.map((file, index) => (
@@ -447,12 +447,12 @@ export default function CompressionScreen() {
         )}
         </BlurView>
       {/* All Files Section (non-compressed) */}
-        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, padding: 24, width: '100%', marginBottom: 18, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12 }}> 
-          <Text style={[styles.sectionTitle, { color: WHITE }]}>All Files</Text>
+        <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: GLASS_BORDER, paddingVertical: 24, paddingHorizontal: 0, width: '100%', marginHorizontal: 0, marginBottom: 18, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12, overflow: 'hidden' }}> 
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 10, textAlign: 'left', marginLeft: 18 }}>All Files</Text>
         {nonCompressedFiles.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="file" size={48} color={theme.textSecondary} />
-            <Text style={[styles.emptyText, { color: theme.textSecondary }]}>No files available for compression</Text>
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: theme.textSecondary, textAlign: 'left', marginLeft: 18 }}>No files available for compression</Text>
           </View>
         ) : (
           nonCompressedFiles.map((file, index) => (
@@ -480,13 +480,13 @@ export default function CompressionScreen() {
         )}
           {/* Refined Compress Button */}
           <TouchableOpacity
-            style={{ backgroundColor: BLUE_ACCENT, borderRadius: 22, paddingVertical: 18, alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 18, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}
+            style={{ backgroundColor: BLUE_ACCENT, borderRadius: 14, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', width: '90%', alignSelf: 'center', marginTop: 18, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}
             onPress={() => setShowOptionsModal(true)}
             disabled={compressing}
             activeOpacity={0.85}
           >
-            <Feather name="archive" size={20} color={WHITE} />
-            <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 17, textAlign: 'center', marginTop: 4 }}>Compress Selected</Text>
+            <Feather name="archive" size={18} color={WHITE} />
+            <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 15, textAlign: 'center', marginTop: 2 }}>Compress Selected</Text>
           </TouchableOpacity>
         </BlurView>
       </ScrollView>
