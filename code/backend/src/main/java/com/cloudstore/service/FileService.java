@@ -286,6 +286,7 @@ public class FileService {
         File file = fileRepository.findByIdAndUser(fileId, user).orElseThrow(() -> new RuntimeException("File not found"));
         file.setDeleted(true);
         fileRepository.save(file);
+        System.out.println("[DEBUG] Marked file as deleted: id=" + file.getId() + ", name=" + file.getName() + ", user=" + user.getEmail());
     }
 
     @Transactional
@@ -309,6 +310,7 @@ public class FileService {
         File file = fileRepository.findByIdAndUser(fileId, user).orElseThrow(() -> new RuntimeException("File not found"));
         file.setDeleted(false);
         fileRepository.save(file);
+        System.out.println("[DEBUG] Restored file: id=" + file.getId() + ", name=" + file.getName() + ", user=" + user.getEmail());
     }
 
     public List<FileResponse> listDeletedFilesByUser(User user, Optional<Long> folderId) {
@@ -319,6 +321,7 @@ public class FileService {
         } else {
             files = fileRepository.findAllByUserAndDeletedTrue(user);
         }
+        System.out.println("[DEBUG] Deleted files for user " + user.getEmail() + ": " + files);
         return files.stream().map(this::toResponse).collect(Collectors.toList());
     }
 

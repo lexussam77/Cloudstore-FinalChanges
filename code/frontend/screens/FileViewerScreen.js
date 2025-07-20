@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Animated } from 'react-native';
 import {
   View,
   Text,
@@ -22,11 +23,16 @@ import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { WebView } from 'react-native-webview';
 import { getDownloadUrl } from './api';
+import { PanResponder } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function FileViewerScreen({ route, navigation }) {
-  const { file } = route.params;
+  const { files = [], initialIndex = 0 } = route.params;
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [prevIndex, setPrevIndex] = useState(initialIndex);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const file = files[currentIndex] || {};
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fileType, setFileType] = useState(null);
@@ -64,6 +70,20 @@ export default function FileViewerScreen({ route, navigation }) {
       ),
     });
   }, [file]);
+
+  // Animate slide when index changes
+  useEffect(() => {
+    if (currentIndex !== prevIndex) {
+      const direction = currentIndex > prevIndex ? 1 : -1;
+      slideAnim.setValue(direction * 400); // Start off-screen
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+      setPrevIndex(currentIndex);
+    }
+  }, [currentIndex]);
 
   const determineFileType = () => {
     if (!file.name) {
@@ -663,6 +683,23 @@ export default function FileViewerScreen({ route, navigation }) {
     }
   };
 
+  // PanResponder for swipe navigation
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        // Only respond to horizontal swipes
+        return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dy) < 20;
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx < -50 && currentIndex < files.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        } else if (gestureState.dx > 50 && currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      },
+    })
+  ).current;
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -705,7 +742,7 @@ export default function FileViewerScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} {...panResponder.panHandlers}>
       <StatusBar barStyle="dark-content" />
       {/* Temporary debug button for PDF testing */}
       {file.name && file.name.toLowerCase().includes('.pdf') && (
@@ -729,7 +766,38 @@ export default function FileViewerScreen({ route, navigation }) {
           <Text style={{ color: 'white', fontSize: 12 }}>Force PDF</Text>
         </TouchableOpacity>
       )}
-      {renderContent()}
+      {/* Left/Right navigation buttons */}
+      {files.length > 1 && currentIndex > 0 && (
+        <TouchableOpacity
+          style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 48, justifyContent: 'center', alignItems: 'flex-start', zIndex: 20, backgroundColor: 'transparent' }}
+          activeOpacity={0.3}
+          onPress={() => setCurrentIndex(currentIndex - 1)}
+        >
+          <View style={{ width: 36, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,0,0,0.12)', justifyContent: 'center', alignItems: 'center', marginLeft: 4 }}>
+            <Feather name="chevron-left" size={32} color="#fff" />
+          </View>
+        </TouchableOpacity>
+      )}
+      {files.length > 1 && currentIndex < files.length - 1 && (
+        <TouchableOpacity
+          style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 48, justifyContent: 'center', alignItems: 'flex-end', zIndex: 20, backgroundColor: 'transparent' }}
+          activeOpacity={0.3}
+          onPress={() => setCurrentIndex(currentIndex + 1)}
+        >
+          <View style={{ width: 36, height: 64, borderRadius: 32, backgroundColor: 'rgba(0,0,0,0.12)', justifyContent: 'center', alignItems: 'center', marginRight: 4 }}>
+            <Feather name="chevron-right" size={32} color="#fff" />
+          </View>
+        </TouchableOpacity>
+      )}
+      <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
+        {renderContent()}
+      </Animated.View>
+      {/* Optional: Show file index indicator */}
+      {files.length > 1 && (
+        <View style={{ position: 'absolute', bottom: 24, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4 }}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>{currentIndex + 1} / {files.length}</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

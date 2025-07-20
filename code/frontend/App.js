@@ -67,7 +67,6 @@ function AppNavigator() {
         <>
           <Stack.Screen name="MainTabs" component={BottomTabNavigation} />
           <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-  
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="Help" component={HelpScreen} />
           <Stack.Screen name="SignOut" component={SignOutScreen} />

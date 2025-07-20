@@ -31,7 +31,7 @@ export default function HomeScreen() {
   const heroAnim = useRef(new Animated.Value(0)).current;
   const recentAnim = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
-  const { hasUnread, markAllRead } = useNotification();
+  const { hasUnread, unreadCount, markAllRead } = useNotification();
 
   useEffect(() => {
     Animated.stagger(120, [
@@ -228,7 +228,7 @@ export default function HomeScreen() {
         >
           {/* Header Row */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 18, marginBottom: 10, marginHorizontal: 24 }}>
-            <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: '#fff', letterSpacing: 0.2 }}>Welcome back</Text>
+            <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: '#fff', letterSpacing: 0.2 }}>Home</Text>
             <TouchableOpacity
               style={[styles.bellButton, { padding: 12 }]} // Increased padding for better touch area
               onPress={() => {
@@ -237,11 +237,15 @@ export default function HomeScreen() {
               }}
             >
               <Feather name="bell" size={32} color={theme.primary} />
-              {hasUnread && <View style={styles.bellBlueTick} />}
+              {unreadCount > 0 && (
+                <View style={styles.bellNumberCircle}>
+                  <Text style={styles.bellNumberText}>{unreadCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
           {/* Glassy Search Bar */}
-          <BlurView intensity={60} tint="dark" style={[styles.glassySearchBarWrap, { backgroundColor: 'transparent', borderWidth: 0 }]}> 
+          <BlurView intensity={60} tint="dark" style={[styles.glassySearchBarWrap, { backgroundColor: 'rgba(20,40,80,0.18)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', overflow: 'hidden' }]}> 
             <Feather name="search" size={20} color={theme.textSecondary} style={styles.searchIcon} />
             <TextInput
               style={[styles.searchInput, { color: theme.searchText, fontFamily: 'Inter_400Regular' }]}
@@ -253,83 +257,27 @@ export default function HomeScreen() {
           </BlurView>
           {/* Search Results */}
           {searchQuery && searchResults !== null && (
-            <Animated.View style={[styles.sectionCard, { 
-              backgroundColor: theme.card,
-              shadowColor: theme.shadow,
-              opacity: recentAnim, 
-              transform: [{ translateY: recentAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] 
-            }]}> 
-              <Text style={[styles.sectionTitle, { color: theme.text, fontFamily: 'Inter_700Bold' }]}>Search Results</Text>
+            <BlurView intensity={90} tint="dark" style={{ backgroundColor: theme.card, borderRadius: 18, marginHorizontal: 12, marginBottom: 12, padding: 16, shadowColor: theme.shadow, shadowOpacity: 0.10, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 3, overflow: 'hidden' }}>
+              <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: theme.text, marginBottom: 10 }}>Search Results</Text>
               {searchResults.length > 0 ? (
                 <FlatList
                   data={searchResults}
-                  keyExtractor={item => item.id}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.recentFilesList}
-                  renderItem={({ item }) => {
-                    const preview = getFilePreview(item);
-                    return (
-                      <BlurView intensity={90} tint="dark" style={styles.filePadGlass}>
-                        <TouchableOpacity 
-                          style={[styles.recentFileCard, { backgroundColor: theme.surface }]}
+                  keyExtractor={item => item.id?.toString()}
+                  renderItem={({ item }) => (
+                    <FileItem
+                      item={item}
                           onPress={() => handleFilePress(item)}
-                          activeOpacity={0.8}
-                        >
-                          <View style={styles.filePreviewContainer}>
-                            {preview?.type === 'image' ? (
-                              <Image 
-                                source={{ uri: preview.source }} 
-                                style={styles.filePreviewImage}
-                                resizeMode="cover"
-                              />
-                            ) : preview?.type === 'video' ? (
-                              <View style={styles.videoPreviewContainer}>
-                                <Image 
-                                  source={{ uri: preview.source }} 
-                                  style={styles.filePreviewImage}
-                                  resizeMode="cover"
-                                />
-                                <View style={[styles.videoPlayOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.6)' }]}> 
-                                  <Feather name="play" size={16} color="#fff" />
-                                </View>
-                              </View>
-                            ) : preview?.type === 'audio' ? (
-                              <View style={[styles.audioPreviewContainer, { backgroundColor: theme.primary }]}> 
-                                <Feather name="music" size={24} color={theme.textInverse} />
-                              </View>
-                            ) : preview?.type === 'pdf' ? (
-                              <View style={[styles.pdfPreviewContainer, { backgroundColor: '#ff4444' }]}> 
-                                <Feather name="file-text" size={24} color="#fff" />
-                              </View>
-                            ) : preview?.type === 'text' ? (
-                              <View style={[styles.textPreviewContainer, { backgroundColor: theme.primary }]}> 
-                                <Feather name="file-text" size={24} color={theme.textInverse} />
-                              </View>
-                            ) : (
-                              <Image source={{ uri: item.thumb }} style={styles.recentFileThumbImg} />
-                            )}
-                          </View>
-                          <Text style={[styles.recentFileName, { color: theme.text, fontFamily: 'Inter_400Regular' }]} numberOfLines={1}>{item.name}</Text>
-                          <Text style={[styles.recentFileMeta, { color: theme.textSecondary, fontFamily: 'Inter_400Regular' }]}>{formatDate(item.modifiedAt || item.createdAt)}</Text>
-                          <TouchableOpacity style={styles.menuButton} activeOpacity={0.7}>
-                            <Feather name="more-vertical" size={20} color={theme.textSecondary} />
-                          </TouchableOpacity>
-                        </TouchableOpacity>
-                      </BlurView>
-                    );
-                  }}
+                      onMenuPress={() => {}}
+                      onStarPress={() => {}}
+                    />
+                  )}
                 />
               ) : (
                 <View style={styles.emptyState}>
-                  <View style={styles.sketchSearch}>
-                    <View style={[styles.sketchSearchIcon, { backgroundColor: theme.textTertiary }]} />
-                    <View style={[styles.sketchSearchLine, { backgroundColor: theme.textTertiary }]} />
-                  </View>
-                  <Text style={[styles.emptyText, { color: theme.textSecondary, fontFamily: 'Inter_400Regular' }]}>No files found</Text>
+                  <Text style={{ color: theme.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 16 }}>No files found</Text>
                 </View>
               )}
-            </Animated.View>
+            </BlurView>
           )}
           
           {/* Recent Files Section - Only show this section */}
@@ -1037,6 +985,28 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
   },
+  bellBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#2563eb',
+    borderWidth: 2,
+    borderColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    zIndex: 10,
+  },
+  bellBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingHorizontal: 1,
+  },
   glassySearchBarWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1088,5 +1058,35 @@ const styles = StyleSheet.create({
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 10 },
     elevation: 12,
+  },
+  bellNumber: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 15,
+    color: '#fff',
+    fontWeight: 'bold',
+    zIndex: 10,
+  },
+  bellNumberCircle: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#2563eb',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  bellNumberText: {
+    color: '#fff',
+    fontFamily: 'Inter_700Bold',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingHorizontal: 2,
   },
 }); 

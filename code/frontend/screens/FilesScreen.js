@@ -60,14 +60,8 @@ const sections = [
 
 // Helper for breadcrumbs - now uses actual folder path
 const getBreadcrumbs = (folderPath) => {
-  const breadcrumbs = ['All Files'];
-  
-  // Add each folder in the path
-  folderPath.forEach(folder => {
-    breadcrumbs.push(folder.name);
-  });
-  
-  return breadcrumbs;
+  // Only show folder path, not 'All Files'
+  return folderPath.map(folder => folder.name);
 };
 
 // Skeleton Loader Component
@@ -1170,7 +1164,10 @@ export default function FilesScreen() {
       return;
     }
     // For other file types, use the in-app viewer
-    navigation.navigate('FileViewer', { file });
+    // Determine the current list of files being shown
+    let currentFiles = filteredFiles;
+    const index = currentFiles.findIndex(f => f.id === file.id);
+    navigation.navigate('FileViewer', { files: currentFiles, initialIndex: index });
   };
 
   return (
@@ -1188,6 +1185,10 @@ export default function FilesScreen() {
             zIndex: 0,
           }}
         />
+        {/* Header Row with All Files and Trash Icon */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 18, marginBottom: 10, marginHorizontal: 24 }}>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: '#fff', letterSpacing: 0.2 }}>Files</Text>
+        </View>
         {/* Bottom half solid or faded gradient */}
         <View
           style={{
@@ -1271,7 +1272,7 @@ export default function FilesScreen() {
           }
         >
             {/* Glassy Search Bar */}
-            <BlurView intensity={60} tint="dark" style={[styles.glassSearchBar, { backgroundColor: 'transparent', borderWidth: 0 }]}> 
+            <BlurView intensity={60} tint="dark" style={[styles.glassSearchBar, { backgroundColor: 'rgba(20,40,80,0.18)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', overflow: 'hidden' }]}> 
               <Feather name="search" size={22} color="#b0c4de" style={styles.searchIcon} />
             <TextInput
                 style={[styles.glassSearchInput, { fontFamily: 'Inter_400Regular' }]}
@@ -1286,6 +1287,30 @@ export default function FilesScreen() {
                 <Feather name="refresh-cw" size={20} color="#2979FF" />
             </TouchableOpacity>
             </BlurView>
+            {/* Search Results */}
+            {searchQuery && searchResults !== null && (
+              <BlurView intensity={90} tint="dark" style={{ backgroundColor: theme.card, borderRadius: 18, marginHorizontal: 12, marginBottom: 12, padding: 16, shadowColor: theme.shadow, shadowOpacity: 0.10, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 3, overflow: 'hidden' }}>
+                <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: theme.text, marginBottom: 10 }}>Search Results</Text>
+                {searchResults.length > 0 ? (
+                  <FlatList
+                    data={searchResults}
+                    keyExtractor={item => item.id?.toString()}
+                    renderItem={({ item }) => (
+                      <FileItem
+                        item={item}
+                        onPress={() => handleFilePress(item)}
+                        onMenuPress={() => handleMenuPress(item, 'file')}
+                        onStarPress={() => handleStarPress(item)}
+                      />
+                    )}
+                  />
+                ) : (
+                  <View style={styles.emptyState}>
+                    <Text style={{ color: theme.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 16 }}>No files found</Text>
+                  </View>
+                )}
+              </BlurView>
+            )}
             {/* Category Bar - Modern, Inter font, recreated from scratch */}
             <ScrollView
               horizontal

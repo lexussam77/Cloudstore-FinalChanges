@@ -185,7 +185,7 @@ export default function AuthScreen({ navigation }) {
         </Animated.View>
         {/* Glassy Flip Card */}
         <Animated.View style={{ width: '100%', maxWidth: 380, opacity: cardAnim, transform: [{ translateY: cardAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }}>
-          <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 32, borderWidth: 1.5, borderColor: GLASS_BORDER, padding: 32, alignItems: 'center', width: '100%', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12 }}>
+          <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 32, borderWidth: 1.5, borderColor: GLASS_BORDER, padding: 32, alignItems: 'center', width: '100%', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12, overflow: 'hidden' }}>
             <View style={{ height: isLogin ? 340 : 480, width: '100%', alignItems: 'center', justifyContent: isLogin ? 'center' : 'flex-start', marginTop: isLogin ? 10 : 0, paddingTop: !isLogin ? 14 : 0, paddingBottom: !isLogin ? 8 : 0 }}>
             <Animated.View
                 style={[{ position: 'absolute', width: '100%', backfaceVisibility: 'hidden', transform: [{ rotateY: frontInterpolate }] }]}

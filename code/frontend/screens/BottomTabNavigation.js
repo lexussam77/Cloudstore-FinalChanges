@@ -75,12 +75,6 @@ export default function BottomTabNavigation({ navigation }) {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Main Screen Content */}
       <View style={[styles.content, { pointerEvents: 'box-none' }]}>
-        {/* Top Bar with Title - Hide for Home tab */}
-        {activeTab !== 'Home' && (
-          <View style={[styles.topBar, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.topBarTitle, { color: theme.text }]}>{activeTab}</Text>
-          </View>
-        )}
         <ScreenComponent />
       </View>
       {/* Bottom Tab Bar */}

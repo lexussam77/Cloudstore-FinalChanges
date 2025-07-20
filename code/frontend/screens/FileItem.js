@@ -73,6 +73,7 @@ export default function FileItem({ item, onMenuPress, onPress, onStarPress }) {
         marginVertical: 6,
         flexDirection: 'row',
         alignItems: 'center',
+        overflow: 'hidden',
         // Removed shadowColor, shadowOpacity, shadowRadius, shadowOffset, elevation for no glow
       }}>
         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={onPress} activeOpacity={0.8}>

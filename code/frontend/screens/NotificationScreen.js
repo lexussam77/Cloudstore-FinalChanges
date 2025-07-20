@@ -36,7 +36,7 @@ export default function NotificationScreen({ navigation }) {
         <Text style={[styles.header, { color: theme.primary, fontFamily: 'Inter_700Bold' }]}>Notifications</Text>
         <FlatList
           data={notifications}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())}
           renderItem={({ item }) => (
             <Swipeable
               renderRightActions={() => renderRightActions(item.id)}

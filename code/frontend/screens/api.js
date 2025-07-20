@@ -157,13 +157,6 @@ export async function deleteFile(token, fileId) {
   });
 }
 
-export async function restoreFile(token, fileId) {
-  return robustFetch(`${API_BASE_URL}/files/restore/${fileId}`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-}
-
 export async function renameFile(token, fileId, newName) {
   return robustFetch(`${API_BASE_URL}/files/rename/${fileId}`, {
     method: 'POST',
@@ -353,8 +346,6 @@ export async function uploadScannedDocument(token, fileUri, fileName, folderId =
     return { success: false, error: error.message || 'Upload failed' };
   }
 }
-
-
 
 // --- LOGOUT (if implemented on backend) ---
 export async function logout(token) {

@@ -48,6 +48,9 @@ export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [hasUnread, setHasUnread] = useState(false);
 
+  // Add unreadCount calculation
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   const addNotification = (message, type = 'info', icon = null, meta = {}) => {
     setNotifications(prev => [{
       id: Date.now(),
@@ -80,7 +83,7 @@ export function NotificationProvider({ children }) {
   }, [addNotification]);
 
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, hasUnread, markAllRead, deleteNotification, clearAllNotifications }}>
+    <NotificationContext.Provider value={{ notifications, addNotification, hasUnread, unreadCount, markAllRead, deleteNotification, clearAllNotifications }}>
       {children}
     </NotificationContext.Provider>
   );
