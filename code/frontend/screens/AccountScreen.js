@@ -170,7 +170,7 @@ export default function AccountScreen({ navigation }) {
                 <Text style={{ color: 'red', fontFamily: 'Inter_400Regular' }}>{error}</Text>
                 ) : (
                   <>
-                  <Text style={[styles.name, { fontFamily: 'Inter_700Bold' }]}>{userProfile.name}</Text>
+                  <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: WHITE, marginBottom: 2, textAlign: 'left' }}>{userProfile.name}</Text>
                   <Text style={[styles.email, { fontFamily: 'Inter_400Regular' }]}>{userProfile.email}</Text>
                   </>
                 )}
@@ -190,14 +190,9 @@ export default function AccountScreen({ navigation }) {
             </View>
         </Animated.View>
 
-        {/* Privacy Protection Image as background between pads */}
-        <View style={{ width: '100%', height: 120, marginTop: -36, marginBottom: -36, position: 'relative', zIndex: 1, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none">
-          <Image source={EyesBro} style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, opacity: 0.92 }} resizeMode="cover" />
-        </View>
-
         {/* Security Section */}
         <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={[styles.sectionTitle, { fontFamily: 'Inter_700Bold', fontSize: 22 }]}>Security</Text>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Security</Text>
           <View style={styles.specsRow}>
           {securityOptions.map((item, idx) => (
                 <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
@@ -210,7 +205,7 @@ export default function AccountScreen({ navigation }) {
               }}
             >
                     <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
-                    <Text style={[styles.specLabel, { fontFamily: 'Inter_400Regular', fontSize: 16 }]}>{item.label}</Text>
+                    <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
             </TouchableOpacity>
                 </BlurView>
               ))}
@@ -227,13 +222,13 @@ export default function AccountScreen({ navigation }) {
 
         {/* Connected Apps Section */}
         <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={[styles.sectionTitle, { fontFamily: 'Inter_700Bold', fontSize: 22 }]}>Connected apps</Text>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Connected apps</Text>
           <View style={styles.specsRow}>
               {connectedApps.map((item, idx) => (
                 <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
                   <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
                     <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
-                    <Text style={[styles.specLabel, { fontFamily: 'Inter_400Regular', fontSize: 16 }]}>{item.label}</Text>
+                    <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
                   </View>
                 </BlurView>
               ))}
@@ -242,13 +237,13 @@ export default function AccountScreen({ navigation }) {
 
         {/* Recent Logins Section */}
         <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={[styles.sectionTitle, { fontFamily: 'Inter_700Bold', fontSize: 22 }]}>Recent logins</Text>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Recent logins</Text>
           <View style={styles.specsRow}>
           {recentLogins.map((item, idx) => (
                 <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
                   <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
                     <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
-                    <Text style={[styles.specLabel, { fontFamily: 'Inter_400Regular', fontSize: 16 }]}>{item.label}</Text>
+                    <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
                   </View>
                 </BlurView>
               ))}
@@ -334,19 +329,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(41,121,255,0.12)',
   },
   glassCard: {
-    backgroundColor: GLASS_BG_DEEP,
-    borderRadius: 36,
+    backgroundColor: '#18213a',
+    borderRadius: 28,
     borderWidth: 1,
     borderColor: GLASS_BORDER,
     shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 12,
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
     marginHorizontal: 16,
     marginBottom: 24,
-    padding: 32,
+    padding: 24,
+    width: '95%',
+    alignSelf: 'center',
+    overflow: 'hidden',
   },
+  // Revert profileCard and avatar to original dominant style
   profileCard: {
     flexDirection: 'row',
     gap: 18,
@@ -387,21 +386,21 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 2,
     textAlign: 'left',
     color: WHITE,
   },
   email: {
-    fontSize: 17,
+    fontSize: 14,
     marginBottom: 8,
     textAlign: 'left',
     color: LIGHT_TEXT,
   },
   planStorageCard: {
-    marginBottom: 28,
-    paddingBottom: 18,
+    marginBottom: 14,
+    paddingBottom: 10,
   },
   planRow: {
     flexDirection: 'row',
@@ -410,7 +409,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   planLabel: {
-    fontSize: 19,
+    fontSize: 15,
     fontWeight: 'bold',
     color: WHITE,
   },
@@ -438,32 +437,34 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 18,
+    marginBottom: 10,
     color: WHITE,
+    fontFamily: 'Inter_700Bold',
+    textAlign: 'left',
   },
   specsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
+    flexDirection: 'column',
+    gap: 8,
   },
   specCard: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 32,
+    borderRadius: 22,
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.18)',
-    paddingVertical: 28,
-    paddingHorizontal: 16,
-    marginHorizontal: 4,
-    overflow: 'hidden', // Ensures blur stays within rounded corners
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginHorizontal: 2,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    backgroundColor: GLASS_BG_DEEP,
   },
   specIcon: {
     marginBottom: 10,
@@ -478,21 +479,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 28,
-    marginHorizontal: 16,
-    marginTop: 36,
-    paddingVertical: 20,
-    backgroundColor: WHITE,
+    borderRadius: 22,
+    marginHorizontal: 18,
+    marginTop: 12,
+    paddingVertical: 10,
+    backgroundColor: BLUE_ACCENT,
     shadowColor: BLUE_ACCENT,
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 10,
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 4,
+    width: '95%',
+    alignSelf: 'center',
   },
   logoutText: {
     fontWeight: 'bold',
-    fontSize: 19,
+    fontSize: 16,
     textAlign: 'center',
-    color: BLUE_ACCENT,
+    color: WHITE,
+    fontFamily: 'Inter_700Bold',
   },
   // Modal Styles
   modalOverlay: {
