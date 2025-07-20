@@ -1403,8 +1403,20 @@ export default function FilesScreen() {
             <View>
               {[...Array(4)].map((_, i) => <SkeletonLoader key={i} type="file" />)}
             </View>
-          ) : filteredFiles.length === 0 && selectedCategory !== 'folders' && selectedCategory !== 'all' ? (
-            null
+          ) : filteredFiles.length === 0 && selectedCategory === 'favourites' ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 64 }}>
+              <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 20, color: theme.text, textAlign: 'center' }}>No favourited files yet</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 15, color: theme.textSecondary, textAlign: 'center', marginTop: 8 }}>
+                Tap the star icon on any file to add it to your favourites.
+              </Text>
+            </View>
+          ) : filteredFiles.length === 0 && selectedCategory === 'scanned' ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 64 }}>
+              <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 20, color: theme.text, textAlign: 'center' }}>No scanned documents yet</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 15, color: theme.textSecondary, textAlign: 'center', marginTop: 8 }}>
+                Use the scanner to add your first document.
+              </Text>
+            </View>
           ) : (
             filteredFiles.map((item, idx) => (
               <FileItem
