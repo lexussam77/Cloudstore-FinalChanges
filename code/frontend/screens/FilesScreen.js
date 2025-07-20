@@ -1464,13 +1464,15 @@ export default function FilesScreen() {
           animationType="fade"
           onRequestClose={closeMenu}
         >
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              {/* Fullscreen BlurView for background blur */}
-              <BlurView intensity={120} tint="dark" style={{ ...StyleSheet.absoluteFillObject, zIndex: 1 }}>
-                <View style={{ flex: 1, backgroundColor: 'rgba(10,10,20,0.55)' }} />
-              </BlurView>
-              {/* Glassy card, more rounded, centered, modern */}
-              <BlurView intensity={90} tint="dark" style={{ backgroundColor: 'rgba(20,40,80,0.32)', borderRadius: 28, padding: 32, alignItems: 'center', width: 320, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', zIndex: 2, shadowColor: '#000', shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 16 }}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {/* Overlay to close menu when clicking outside */}
+            <TouchableOpacity style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 2 }} activeOpacity={1} onPress={closeMenu} />
+            {/* Fullscreen BlurView for background blur */}
+            <BlurView intensity={120} tint="dark" style={{ ...StyleSheet.absoluteFillObject, zIndex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(10,10,20,0.55)' }} />
+            </BlurView>
+            {/* Glassy card, more rounded, centered, modern */}
+            <BlurView intensity={90} tint="dark" style={{ backgroundColor: 'rgba(20,40,80,0.32)', borderRadius: 28, padding: 32, alignItems: 'center', width: 320, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', zIndex: 3, shadowColor: '#000', shadowOpacity: 0.22, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 16 }}>
               {menuType === 'file' ? (
                 <>
                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, borderRadius: 16, marginBottom: 12, width: '100%', backgroundColor: 'rgba(255,255,255,0.04)' }} onPress={() => handleMenuAction('open', selectedItem, 'file')}>
