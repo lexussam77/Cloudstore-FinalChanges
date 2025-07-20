@@ -208,8 +208,10 @@ export default function HomeScreen() {
   };
 
   const handleFilePress = (file) => {
-    // Navigate to file viewer screen
-    navigation.navigate('FileViewer', { file });
+    // Find the index of the tapped file in recentFiles
+    const index = recentFiles.findIndex(f => f.file.id === file.id);
+    // Pass the full recentFiles list and initial index to FileViewer
+    navigation.navigate('FileViewer', { files: recentFiles.map(f => f.file), initialIndex: index });
   };
 
   return (
@@ -293,7 +295,7 @@ export default function HomeScreen() {
                   onStarPress={() => {}}
                 />
               ))}
-                              </View>
+            </View>
           )}
           
           {/* Folders Grid */}
@@ -1010,11 +1012,11 @@ const styles = StyleSheet.create({
   glassySearchBarWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 32,
-    marginHorizontal: 18,
+    borderRadius: 20, // reduced from 32
+    marginHorizontal: 0,
     marginBottom: 16,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 14, // slightly reduced
+    paddingVertical: 8, // reduced from 14
     shadowOpacity: 0.12,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
@@ -1022,6 +1024,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,40,80,0.32)',
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.10)',
+    width: '95%',
+    alignSelf: 'center',
   },
   filePadGlass: {
     borderRadius: 18,
