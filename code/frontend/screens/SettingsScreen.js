@@ -49,6 +49,9 @@ export default function SettingsScreen({ navigation }) {
   if (!fontsLoaded) return null;
   return (
     <LinearGradient colors={DEEP_BLUE_GRADIENT} style={{ flex: 1 }}>
+      <TouchableOpacity style={{ position: 'absolute', top: 38, left: 18, zIndex: 10, backgroundColor: 'rgba(20,40,80,0.32)', borderRadius: 18, padding: 8 }} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+        <Feather name="arrow-left" size={22} color={WHITE} />
+      </TouchableOpacity>
       <ScrollView contentContainerStyle={{ paddingBottom: 80, paddingTop: 8 }} showsVerticalScrollIndicator={false}>
         {/* Optional: Glassy/gradient header or illustration can go here */}
         <View style={{ alignItems: 'center', marginTop: 24, marginBottom: 18 }}>
@@ -58,7 +61,7 @@ export default function SettingsScreen({ navigation }) {
           </Text>
         </View>
         {/* Account Section */}
-        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 }}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
           <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 14 }}>Your account</Text>
           {accountSettings.map((item, idx) => (
             <TouchableOpacity
@@ -76,7 +79,7 @@ export default function SettingsScreen({ navigation }) {
           ))}
         </BlurView>
         {/* App Section */}
-        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 }}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
           <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 14 }}>App</Text>
           {appSettings.map((item, idx) => (
             <TouchableOpacity
@@ -108,7 +111,7 @@ export default function SettingsScreen({ navigation }) {
           ))}
         </BlurView>
         {/* Danger Zone Section */}
-        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: 'crimson', marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 }}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: 'crimson', marginHorizontal: 16, marginBottom: 24, padding: 24, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
           <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: 'crimson', marginBottom: 14 }}>Danger Zone</Text>
           {dangerZone.map((item, idx) => (
             <TouchableOpacity

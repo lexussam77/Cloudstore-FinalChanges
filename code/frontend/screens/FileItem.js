@@ -65,12 +65,15 @@ export default function FileItem({ item, onMenuPress, onPress, onStarPress }) {
     <Animated.View style={{ opacity: fadeAnim, width: '100%' }}>
       <BlurView intensity={90} tint="dark" style={{
         backgroundColor: 'rgba(20,40,80,0.32)',
-        borderRadius: 22,
+        borderRadius: 14, // reduced from 22
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.10)',
-        padding: 16,
-        marginHorizontal: 8,
-        marginVertical: 6,
+        paddingVertical: 8, // reduced
+        paddingHorizontal: 10, // slightly reduced
+        width: '95%',
+        alignSelf: 'center',
+        marginHorizontal: 0,
+        marginVertical: 4, // reduced
         flexDirection: 'row',
         alignItems: 'center',
         overflow: 'hidden',
