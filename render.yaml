@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cloudstore-backend
+    env: java
+    rootDir: code/backend
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/cloudstore-backend-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+
+  - type: web
+    name: cloudstore-frontend
+    env: node
+    rootDir: code/frontend
+    buildCommand: npm install
+    startCommand: npx expo start --web 
