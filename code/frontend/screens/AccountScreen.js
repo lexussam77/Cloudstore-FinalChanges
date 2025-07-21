@@ -174,9 +174,9 @@ export default function AccountScreen({ navigation }) {
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
-        <Animated.View style={[styles.glassCard, styles.profileCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-            <View style={styles.profileImageWrap}>
-              <TouchableOpacity onPress={pickImage} activeOpacity={0.8} style={styles.avatarCircleImgWrap}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 16, padding: 0, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden', minHeight: 100 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 18 }}>
+            <TouchableOpacity onPress={pickImage} activeOpacity={0.8} style={[styles.avatarCircleImgWrap, { marginRight: 16 }] }>
                 {avatarUri ? (
                   <Image source={{ uri: avatarUri }} style={styles.avatarCircleImg} />
                 ) : (
@@ -188,71 +188,68 @@ export default function AccountScreen({ navigation }) {
                   <Feather name="edit-3" size={16} color={WHITE} />
                 </View>
                 </TouchableOpacity>
+            <View style={{ flex: 1, justifyContent: 'center', minWidth: 0 }}>
+              {loading ? (
+                <ActivityIndicator size="small" color={BLUE_ACCENT} style={{ marginTop: 0 }} />
+              ) : error ? (
+                <Text style={{ color: 'red', fontFamily: 'Inter_400Regular', marginTop: 0, fontSize: 14, textAlign: 'left' }} numberOfLines={1} adjustsFontSizeToFit>{error}</Text>
+              ) : (
+                <>
+                  <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 17, color: WHITE, marginBottom: 2, textAlign: 'left' }} numberOfLines={1} adjustsFontSizeToFit>{userProfile.name}</Text>
+                  <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: LIGHT_TEXT, textAlign: 'left' }} numberOfLines={1} adjustsFontSizeToFit>{userProfile.email}</Text>
+                </>
+              )}
             </View>
-            <View style={styles.profileTextWrap}>
-                {loading ? (
-                <ActivityIndicator size="small" color={BLUE_ACCENT} />
-                ) : error ? (
-                <Text style={{ color: 'red', fontFamily: 'Inter_400Regular' }}>{error}</Text>
-                ) : (
-                  <>
-                  <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 28, color: WHITE, marginBottom: 2, textAlign: 'left' }}>{userProfile.name}</Text>
-                  <Text style={[styles.email, { fontFamily: 'Inter_400Regular' }]}>{userProfile.email}</Text>
-                  </>
-                )}
-            </View>
-        </Animated.View>
+          </View>
+        </BlurView>
         
         {/* Plan and Storage Card */}
-        <Animated.View style={[styles.glassCard, styles.planStorageCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <View style={{ alignItems: 'center', marginBottom: 10 }}>
-            <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 16, marginBottom: 6, textAlign: 'center', alignSelf: 'center' }} numberOfLines={1} adjustsFontSizeToFit>
-              Storage Used: {formatBytes(totalFileSize)} / {formatQuota(userProfile.storageQuota)}
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 0, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 0, marginTop: 18, marginLeft: 24 }}>Your storage</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 18, paddingHorizontal: 24, justifyContent: 'space-between' }}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 15, marginBottom: 4, textAlign: 'center', alignSelf: 'center' }} numberOfLines={1} adjustsFontSizeToFit>
+                {formatBytes(totalFileSize)} / {formatQuota(userProfile.storageQuota)}
+              </Text>
+              <View style={{ width: '100%', height: 10, backgroundColor: '#233', borderRadius: 6, overflow: 'hidden', marginBottom: 6 }}>
+                {(() => {
+                  let percent = userProfile.storageQuota && userProfile.storageQuota > 0 ? (totalFileSize / userProfile.storageQuota) * 100 : 0;
+                  let barWidth = percent > 0 && percent < 0.5 ? 4 : `${Math.min(100, percent)}%`;
+                  return (
+                    <View style={{ width: barWidth, height: '100%', backgroundColor: BLUE_ACCENT, borderRadius: 6 }} />
+                  );
+                })()}
+          </View>
+              <Text style={{ color: '#aaa', fontFamily: 'Inter_400Regular', fontSize: 11 }}>
+                {userProfile.storageQuota && userProfile.storageQuota > 0
+                  ? ((totalFileSize / userProfile.storageQuota) * 100).toFixed(2) + '% used'
+                  : '0% used'}
             </Text>
-            <View style={{ width: '90%', height: 8, backgroundColor: '#233', borderRadius: 8, overflow: 'hidden', marginBottom: 8 }}>
-              {(() => {
-                let percent = userProfile.storageQuota && userProfile.storageQuota > 0 ? (totalFileSize / userProfile.storageQuota) * 100 : 0;
-                let barWidth = percent > 0 && percent < 0.5 ? 4 : `${Math.min(100, percent)}%`;
-                return (
-                  <View style={{ width: barWidth, height: '100%', backgroundColor: BLUE_ACCENT, borderRadius: 8 }} />
-                );
-              })()}
             </View>
-            <Text style={{ color: '#aaa', fontFamily: 'Inter_400Regular', fontSize: 12 }}>
-              {userProfile.storageQuota && userProfile.storageQuota > 0
-                ? ((totalFileSize / userProfile.storageQuota) * 100).toFixed(2) + '% used'
-                : '0% used'}
-            </Text>
           </View>
-          <View style={{ alignItems: 'center' }}>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 999, backgroundColor: BLUE_ACCENT, paddingVertical: 14, paddingHorizontal: 32, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }} activeOpacity={0.85} onPress={() => navigation.navigate('ManagePlan', { userEmail: userProfile.email, refetchProfile: () => fetchUserProfileAndFiles() })}>
-              <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 16 }}>Upgrade</Text>
-              <Feather name="arrow-right" size={16} color={WHITE} style={{ marginLeft: 6 }} />
+          <TouchableOpacity style={{ backgroundColor: BLUE_ACCENT, borderRadius: 18, paddingVertical: 14, paddingHorizontal: 0, marginHorizontal: 24, marginBottom: 18, marginTop: 0, width: '90%', alignSelf: 'center', shadowColor: BLUE_ACCENT, shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6 }} activeOpacity={0.85} onPress={() => navigation.navigate('ManagePlan', { userEmail: userProfile.email })}>
+            <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 17, textAlign: 'center', letterSpacing: 0.2 }}>Upgrade</Text>
             </TouchableOpacity>
-          </View>
-        </Animated.View>
+        </BlurView>
 
         {/* Security Section */}
-        <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Security</Text>
-          <View style={styles.specsRow}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 0, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 0, marginTop: 18, marginLeft: 24 }}>Security</Text>
           {securityOptions.map((item, idx) => (
-                <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
             <TouchableOpacity
-                    style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}
+              key={idx}
+              style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: idx !== securityOptions.length-1 ? 1 : 0, borderColor: GLASS_BORDER, paddingVertical: 18, paddingHorizontal: 24 }}
               activeOpacity={0.85}
               onPress={() => {
                 if (item.label === 'Change password') navigation.navigate('ChangePassword');
                 if (item.label === 'Two-factor authentication') navigation.navigate('TwoFactor');
               }}
             >
-                    <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
+              <Feather name={item.icon} size={22} color={BLUE_ACCENT} style={{ marginRight: 14 }} />
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
             </TouchableOpacity>
+          ))}
                 </BlurView>
-              ))}
-            </View>
-          </Animated.View>
 
         {/* 24/7 Support Section (image and main text only) */}
         <View style={{ alignItems: 'center', marginBottom: 32, width: '100%' }}>
@@ -263,34 +260,32 @@ export default function AccountScreen({ navigation }) {
         </View>
 
         {/* Connected Apps Section */}
-        <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Connected apps</Text>
-          <View style={styles.specsRow}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 0, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 0, marginTop: 18, marginLeft: 24 }}>Connected apps</Text>
               {connectedApps.map((item, idx) => (
-                <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
-                  <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                    <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
+            <View
+              key={idx}
+              style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: idx !== connectedApps.length-1 ? 1 : 0, borderColor: GLASS_BORDER, paddingVertical: 18, paddingHorizontal: 24 }}
+            >
+              <Feather name={item.icon} size={22} color={BLUE_ACCENT} style={{ marginRight: 14 }} />
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
                   </View>
+          ))}
                 </BlurView>
-              ))}
-              </View>
-        </Animated.View>
 
         {/* Recent Logins Section */}
-        <Animated.View style={[styles.glassCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
-          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: WHITE, marginBottom: 18 }}>Recent logins</Text>
-          <View style={styles.specsRow}>
+        <BlurView intensity={80} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1, borderColor: GLASS_BORDER, marginHorizontal: 16, marginBottom: 24, padding: 0, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, overflow: 'hidden' }}>
+          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: WHITE, marginBottom: 0, marginTop: 18, marginLeft: 24 }}>Recent logins</Text>
           {recentLogins.map((item, idx) => (
-                <BlurView intensity={120} tint="dark" style={styles.specCard} key={idx}>
-                  <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                    <Feather name={item.icon} size={28} color={BLUE_ACCENT} style={styles.specIcon} />
+            <View
+              key={idx}
+              style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: idx !== recentLogins.length-1 ? 1 : 0, borderColor: GLASS_BORDER, paddingVertical: 18, paddingHorizontal: 24 }}
+            >
+              <Feather name={item.icon} size={22} color={BLUE_ACCENT} style={{ marginRight: 14 }} />
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: WHITE }}>{item.label}</Text>
-                  </View>
-                </BlurView>
-              ))}
             </View>
-        </Animated.View>
+          ))}
+        </BlurView>
 
         {/* Logout Button */}
           <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 28, marginHorizontal: 16, marginTop: 36, paddingVertical: 20, backgroundColor: BLUE_ACCENT, shadowOpacity: 0.18, shadowRadius: 12, elevation: 10 }} onPress={() => setShowLogoutModal(true)} activeOpacity={0.85}>
