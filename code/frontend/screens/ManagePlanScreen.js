@@ -8,6 +8,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Text as RNText, TextInput as RNTextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { purchaseStorage } from './api';
 
 // Set Inter font as default for all Text and TextInput
 RNText.defaultProps = RNText.defaultProps || {};
@@ -20,9 +22,9 @@ const plans = [
     key: 'plus',
     name: 'Plus',
     price: 'GH₵60.00 per month',
-    storage: '2TB',
+    storage: '5GB',
     features: [
-      'Use 2,000 GB of encrypted cloud storage',
+      'Use 5GB of encrypted cloud storage',
       'Send big files with Dropbox Transfer',
       'Automatically back up your files',
     ],
@@ -30,10 +32,10 @@ const plans = [
   {
     key: 'family',
     name: 'Family',
-    price: 'Up to 6 accounts, GH₵120.00 per month',
-    storage: '2,000 GB',
+    price: 'GH₵120.00 per month',
+    storage: '10GB',
     features: [
-      '2,000 GB of encrypted cloud storage',
+      '10GB of encrypted cloud storage',
       'Up to 6 individual accounts',
       'No matter whose files, everything is private',
     ],
@@ -41,10 +43,10 @@ const plans = [
   {
     key: 'professional',
     name: 'Professional',
-    price: '3TB, GH₵130.00 per month',
-    storage: '3,000 GB',
+    price: 'GH₵130.00 per month',
+    storage: '20GB',
     features: [
-      'Use 3,000 GB of encrypted cloud storage',
+      'Use 20GB of encrypted cloud storage',
       'Access all Plus plan benefits and features',
       'Send big files with Dropbox Transfer',
     ],
@@ -57,12 +59,16 @@ const DEEP_BLUE_GRADIENT = ['#0a0f1c', '#12203a', '#1a2a4f'];
 const GLASS_BG_DEEP = 'rgba(20,40,80,0.32)';
 const GLASS_BORDER = 'rgba(255,255,255,0.10)';
 
-export default function ManagePlanScreen() {
+export default function ManagePlanScreen({ navigation, route }) {
   const { theme } = useTheme();
   const [selectedTab, setSelectedTab] = useState(0);
   const flatListRef = useRef();
-  const navigation = useNavigation();
   const { isPremium, premiumPlan, upgradeToPremium } = usePremium();
+  const userEmail = route?.params?.userEmail || '';
+  // Do not use refetchProfile from params to avoid non-serializable warning
+
+  // Remove mobile money modal and purchaseStorage logic
+  // Keep only the simulated payment modal and logic
 
   // Simulated payment modal state
   const [showModal, setShowModal] = useState(false);
@@ -71,54 +77,15 @@ export default function ManagePlanScreen() {
   const [phone, setPhone] = useState('');
   const [processing, setProcessing] = useState(false);
 
-  // Add state for two-step modal
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showMobileModal, setShowMobileModal] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [mobileError, setMobileError] = useState('');
-
-  const handleTabPress = (idx) => {
-    setSelectedTab(idx);
-    flatListRef.current.scrollToIndex({ index: idx });
-  };
-
-  const handleScroll = (event) => {
-    const idx = Math.round(event.nativeEvent.contentOffset.x / (width * 0.85));
-    setSelectedTab(idx);
-  };
-
   const handleTryPlan = (plan) => {
     setSelectedPlan(plan);
-    setShowConfirmModal(true);
+    setShowModal(true);
     setNetwork('MTN');
     setPhone('');
   };
 
-  // New: handleContinueToMobile
-  const handleContinueToMobile = () => {
-    setShowConfirmModal(false);
-    setShowMobileModal(true);
-  };
-
-  // New: handleMobilePay
-  const handleMobilePay = async () => {
-    if (!mobileNumber.match(/^0\d{9}$/)) {
-      setMobileError('Enter a valid 10-digit Ghana number (e.g. 0551234567)');
-      return;
-    }
-    setMobileError('');
-    setProcessing(true);
-    setTimeout(async () => {
-      await upgradeToPremium(selectedPlan, network, mobileNumber);
-      setProcessing(false);
-      setShowMobileModal(false);
-      setMobileNumber('');
-      Alert.alert('Success', 'You are now a premium user!');
-    }, 1500);
-  };
-
   const handleSimulatePayment = async () => {
-    if (!phone.match(/^\d{10}$/)) {
+    if (!phone.match(/^[0-9]{10}$/)) {
       Alert.alert('Invalid Number', 'Please enter a valid 10-digit phone number.');
       return;
     }
@@ -129,6 +96,22 @@ export default function ManagePlanScreen() {
       setShowModal(false);
       Alert.alert('Success', 'You are now a premium user!');
     }, 1500);
+  };
+
+  // Remove all mobile money modal and handleMobilePay logic
+
+  // Add handleScroll function for FlatList
+  const handleScroll = (event) => {
+    const idx = Math.round(event.nativeEvent.contentOffset.x / (width * 0.85));
+    setSelectedTab(idx);
+  };
+
+  // Add handleTabPress function for plan tab switching
+  const handleTabPress = (idx) => {
+    setSelectedTab(idx);
+    if (flatListRef.current) {
+      flatListRef.current.scrollToIndex({ index: idx });
+    }
   };
 
   let [fontsLoaded] = useFonts({ Inter_400Regular, Inter_700Bold });
@@ -164,9 +147,9 @@ export default function ManagePlanScreen() {
           snapToInterval={width * 0.85 + 20}
           decelerationRate="fast"
           renderItem={({ item }) => (
-            <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: theme.primary, marginHorizontal: 10, padding: 28, shadowColor: theme.shadow, shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 10, width: width * 0.85 }}>
+            <BlurView intensity={90} tint="dark" style={{ backgroundColor: GLASS_BG_DEEP, borderRadius: 28, borderWidth: 1.5, borderColor: theme.primary, marginHorizontal: 10, padding: 28, shadowColor: theme.shadow, shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 10, width: width * 0.85, overflow: 'hidden' }}>
               <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: theme.text, marginBottom: 4 }}>{item.name}</Text>
-              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: theme.text, marginBottom: 14 }}>{item.storage}, {item.price}</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: theme.text, marginBottom: 14 }}>{item.storage} {item.price}</Text>
               <View style={{ marginBottom: 14, width: '100%' }}>
                 {item.features.map((f, idx) => (
                   <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -182,7 +165,7 @@ export default function ManagePlanScreen() {
           )}
         />
         {/* Simulated Payment Modal */}
-        <Modal visible={showConfirmModal} transparent animationType="fade">
+        <Modal visible={showModal} transparent animationType="fade">
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,10,20,0.55)', zIndex: 1 }} />
             <View style={{ backgroundColor: theme.card, borderRadius: 18, padding: 28, maxWidth: '90%', marginHorizontal: 16, alignItems:'center', shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 12, elevation: 8, zIndex: 2 }}>
@@ -191,39 +174,20 @@ export default function ManagePlanScreen() {
                 <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: theme.primary, marginBottom: 2 }}>Try Free for 30 Days</Text>
               </View>
               <Text style={{ marginBottom: 8, color: theme.text, fontFamily: 'Inter_400Regular', fontSize: 15, textAlign: 'center' }}>Enjoy all premium features for 30 days. No charge until your trial ends. You can cancel anytime.</Text>
-              <TouchableOpacity style={{ backgroundColor: theme.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40, marginBottom: 10, width: '100%', alignItems:'center', shadowColor: theme.shadow, shadowOpacity: 0.10, shadowRadius: 8, elevation: 2 }} onPress={handleContinueToMobile}>
-                <Text style={{ fontFamily: 'Inter_700Bold', color: theme.textInverse, fontSize: 16, letterSpacing: 0.5 }}>Continue</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowConfirmModal(false)}>
-                <Text style={{ color: theme.primary, marginTop: 8, fontFamily: 'Inter_700Bold', fontSize: 15 }}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-        {/* Add the Mobile Money Number modal */}
-        <Modal visible={showMobileModal} transparent animationType="fade">
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,10,20,0.55)', zIndex: 1 }} />
-            <View style={{ backgroundColor: theme.card, borderRadius: 18, padding: 28, maxWidth: '90%', marginHorizontal: 16, alignItems:'center', shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 12, elevation: 8, zIndex: 2 }}>
-              <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                <Text style={{ fontSize: 32, marginBottom: 2 }}>💳</Text>
-                <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 22, color: theme.primary, marginBottom: 2 }}>Mobile Money Number</Text>
-              </View>
-              <Text style={{ marginBottom: 8, color: theme.text, fontFamily: 'Inter_400Regular', fontSize: 15, textAlign: 'center' }}>Enter your Ghana mobile money number to start your free trial.</Text>
+              {/* Mobile Money Number Input */}
               <TextInput
                 style={{ width: '100%', borderWidth: 1.5, borderColor: theme.primary, borderRadius: 10, padding: 14, marginBottom: 8, color: theme.text, backgroundColor: theme.input, fontSize: 16, fontFamily: 'Inter_400Regular', letterSpacing: 1 }}
                 placeholder="0551234567"
                 placeholderTextColor={theme.textSecondary}
                 keyboardType="number-pad"
-                value={mobileNumber}
-                onChangeText={setMobileNumber}
+                value={phone}
+                onChangeText={setPhone}
                 maxLength={10}
               />
-              {mobileError ? <Text style={{ color: 'crimson', fontFamily: 'Inter_700Bold', marginBottom: 8 }}>{mobileError}</Text> : null}
-              <TouchableOpacity style={{ backgroundColor: theme.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40, marginBottom: 10, width: '100%', alignItems:'center', shadowColor: theme.shadow, shadowOpacity: 0.10, shadowRadius: 8, elevation: 2 }} onPress={handleMobilePay} disabled={processing}>
+              <TouchableOpacity style={{ backgroundColor: theme.primary, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 40, marginBottom: 10, width: '100%', alignItems:'center', shadowColor: theme.shadow, shadowOpacity: 0.10, shadowRadius: 8, elevation: 2 }} onPress={handleSimulatePayment} disabled={processing}>
                 {processing ? <ActivityIndicator color={theme.textInverse} /> : <Text style={{ fontFamily: 'Inter_700Bold', color: theme.textInverse, fontSize: 16, letterSpacing: 0.5 }}>Pay Now</Text>}
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { setShowMobileModal(false); setMobileNumber(''); setMobileError(''); }} disabled={processing}>
+              <TouchableOpacity onPress={() => setShowModal(false)}>
                 <Text style={{ color: theme.primary, marginTop: 8, fontFamily: 'Inter_700Bold', fontSize: 15 }}>Cancel</Text>
               </TouchableOpacity>
             </View>
