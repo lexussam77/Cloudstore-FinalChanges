@@ -7,7 +7,7 @@ import LogoutSVG from '../assets/images/undraw_log-out_2vod.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
-import { getCurrentUser } from './api';
+import { getCurrentUser, listFiles } from './api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { BlurView } from 'expo-blur';
@@ -104,35 +104,61 @@ export default function AccountScreen({ navigation }) {
     }
   };
 
-  const [userProfile, setUserProfile] = useState({ name: '', email: '' });
+  const [userProfile, setUserProfile] = useState({ name: '', email: '', storageQuota: 0 });
+  const [totalFileSize, setTotalFileSize] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserProfileAndFiles = async () => {
       setLoading(true);
       setError(null);
       try {
         const token = await AsyncStorage.getItem('jwt');
         if (!token) {
           setError('No token found.');
-          
           setLoading(false);
           return;
         }
         const res = await getCurrentUser(token);
-        console.log('User profile response:', res);
         if (res.success && res.data) {
-          setUserProfile({ name: res.data.name, email: res.data.email });
+          setUserProfile({
+            name: res.data.name,
+            email: res.data.email,
+            storageQuota: res.data.storageQuota && res.data.storageQuota > 0 ? res.data.storageQuota : 1073741824, // 1GB default
+          });
         } else {
           setError('Failed to fetch user profile.');
         }
+        // Fetch all files and sum their sizes
+        const filesRes = await listFiles(token);
+        if (filesRes.success && Array.isArray(filesRes.data)) {
+          const sum = filesRes.data.reduce((acc, f) => acc + (f.size || 0), 0);
+          setTotalFileSize(sum);
+        } else {
+          setTotalFileSize(0);
+        }
       } catch (err) {
         setError('Failed to fetch user profile.');
+        setTotalFileSize(0);
       }
       setLoading(false);
     };
-    fetchUserProfile();
+    fetchUserProfileAndFiles();
   }, [isFocused]);
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  // Helper to format quota nicely (e.g., 1 GB instead of 1073741824 B)
+  function formatQuota(bytes) {
+    if (bytes === 1073741824) return '1 GB';
+    return formatBytes(bytes);
+  }
 
   let [fontsLoaded] = useFonts({ Inter_400Regular, Inter_700Bold });
   if (!fontsLoaded) return null;
@@ -180,14 +206,30 @@ export default function AccountScreen({ navigation }) {
         {/* Plan and Storage Card */}
         <Animated.View style={[styles.glassCard, styles.planStorageCard, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}> 
           <View style={{ alignItems: 'center', marginBottom: 10 }}>
-            <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 19, color: WHITE, textAlign: 'center' }}>Need more storage?</Text>
+            <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 16, marginBottom: 6, textAlign: 'center', alignSelf: 'center' }} numberOfLines={1} adjustsFontSizeToFit>
+              Storage Used: {formatBytes(totalFileSize)} / {formatQuota(userProfile.storageQuota)}
+            </Text>
+            <View style={{ width: '90%', height: 8, backgroundColor: '#233', borderRadius: 8, overflow: 'hidden', marginBottom: 8 }}>
+              {(() => {
+                let percent = userProfile.storageQuota && userProfile.storageQuota > 0 ? (totalFileSize / userProfile.storageQuota) * 100 : 0;
+                let barWidth = percent > 0 && percent < 0.5 ? 4 : `${Math.min(100, percent)}%`;
+                return (
+                  <View style={{ width: barWidth, height: '100%', backgroundColor: BLUE_ACCENT, borderRadius: 8 }} />
+                );
+              })()}
+            </View>
+            <Text style={{ color: '#aaa', fontFamily: 'Inter_400Regular', fontSize: 12 }}>
+              {userProfile.storageQuota && userProfile.storageQuota > 0
+                ? ((totalFileSize / userProfile.storageQuota) * 100).toFixed(2) + '% used'
+                : '0% used'}
+            </Text>
           </View>
           <View style={{ alignItems: 'center' }}>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 999, backgroundColor: BLUE_ACCENT, paddingVertical: 14, paddingHorizontal: 32, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }} activeOpacity={0.85} onPress={() => navigation.navigate('ManagePlan')}>
-                <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 16 }}>Upgrade</Text>
-                <Feather name="arrow-right" size={16} color={WHITE} style={{ marginLeft: 6 }} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 999, backgroundColor: BLUE_ACCENT, paddingVertical: 14, paddingHorizontal: 32, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }} activeOpacity={0.85} onPress={() => navigation.navigate('ManagePlan', { userEmail: userProfile.email, refetchProfile: () => fetchUserProfileAndFiles() })}>
+              <Text style={{ color: WHITE, fontFamily: 'Inter_700Bold', fontSize: 16 }}>Upgrade</Text>
+              <Feather name="arrow-right" size={16} color={WHITE} style={{ marginLeft: 6 }} />
+            </TouchableOpacity>
+          </View>
         </Animated.View>
 
         {/* Security Section */}
