@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Make mvnw executable
-RUN chmod +x mvnw
+RUN apt-get update && apt-get install -y dos2unix && dos2unix mvnw && chmod +x mvnw
 
 # Build the project
 RUN ./mvnw clean package
