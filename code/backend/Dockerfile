@@ -10,6 +10,9 @@ COPY . /app
 # Make mvnw executable
 RUN apt-get update && apt-get install -y dos2unix && dos2unix mvnw && chmod +x mvnw
 
+# Debug: list files before build
+RUN ls -l /app && ls -l /app/.mvn/wrapper
+
 # Build the project
 RUN ./mvnw clean package
 
